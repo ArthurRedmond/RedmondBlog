@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using RedmondBlog.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -33,7 +34,7 @@ namespace RedmondBlog.Models
         [Display(Name = "Updated Date")]
         public DateTime? Updated { get; set; }
 
-        public bool IsReady { get; set; }
+        public ReadyStatus ReadyStatus { get; set; }
 
         public string Slug { get; set; }
 
