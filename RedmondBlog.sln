@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedmondBlog", "RedmondBlog\RedmondBlog.csproj", "{0D74AA4A-A59F-42C6-8380-D0A122BAB2B3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0D74AA4A-A59F-42C6-8380-D0A122BAB2B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D74AA4A-A59F-42C6-8380-D0A122BAB2B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D74AA4A-A59F-42C6-8380-D0A122BAB2B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D74AA4A-A59F-42C6-8380-D0A122BAB2B3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {571C7696-496B-4E19-BA8A-CFB38288E9BD}
+	EndGlobalSection
+EndGlobal
