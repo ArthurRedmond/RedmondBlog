@@ -19,6 +19,6 @@ namespace RedmondBlog.Models
 
         //Navigation Properties
         public virtual Post Post { get; set; }
-        public virtual IdentityUser Author { get; set; }
+        public virtual BlogUser Author { get; set; }
     }
 }
