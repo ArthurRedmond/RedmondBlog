@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using RedmondBlog.Enums;
+﻿using RedmondBlog.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,11 +11,11 @@ namespace RedmondBlog.Models
     {
         public int Id { get; set; }
         public int PostId { get; set; }
-        public string BlogUserId { get; set; }
+        public string AuthorId { get; set; }
         public string ModeratorId { get; set; }
 
         [Required]
-        [StringLength(500, ErrorMessage = "The {0} must be at least {2} and no more than {1} characters long.", MinimumLength = 2)]
+        [StringLength(500, ErrorMessage = "The {0} must be at least {2] characters but no more than {1}", MinimumLength = 2)]
         [Display(Name = "Comment")]
         public string Body { get; set; }
 
@@ -25,15 +24,15 @@ namespace RedmondBlog.Models
         public DateTime? Moderated { get; set; }
         public DateTime? Deleted { get; set; }
 
-        [StringLength(500, ErrorMessage = "The {0} must be at least {2} and no more than {1} characters long.", MinimumLength = 2)]
+        [StringLength(500, ErrorMessage = "The {0} must be at least {2] characters but no more than {1}", MinimumLength = 2)]
         [Display(Name = "Moderated Comment")]
         public string ModeratedBody { get; set; }
 
         public ModerationType ModerationType { get; set; }
 
-        //Navigation properties
+        //Navigation Properties
         public virtual Post Post { get; set; }
-        public virtual BlogUser BlogUser { get; set; }
+        public virtual BlogUser Author { get; set; }
         public virtual BlogUser Moderator { get; set; }
     }
 }

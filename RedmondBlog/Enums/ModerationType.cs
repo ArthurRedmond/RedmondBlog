@@ -12,14 +12,14 @@ namespace RedmondBlog.Enums
         Political,
         [Description("Offensive language")]
         Language,
-        [Description("Drug references")]
+        [Description("Drug reference")]
         Drugs,
         [Description("Threatening speech")]
         Threatening,
         [Description("Sexual content")]
         Sexual,
         [Description("Hate speech")]
-        HateSpeech,
+        HateSpeach,
         [Description("Targeted shaming")]
         Shaming
     }

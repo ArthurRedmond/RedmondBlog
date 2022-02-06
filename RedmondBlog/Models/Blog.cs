@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,13 +11,13 @@ namespace RedmondBlog.Models
     public class Blog
     {
         public int Id { get; set; }
-        public string BlogUserId { get; set; }
+        public string AuthorId { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at most {1} characters.", MinimumLength = 2)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters and no more than {1}", MinimumLength = 2)]
         public string Name { get; set; }
         [Required]
-        [StringLength(500, ErrorMessage = "The {0} must be at least {2} and at most {1} characters.", MinimumLength = 2)]
+        [StringLength(500, ErrorMessage = "The {0} must be at least {2} characters and no more than {1}", MinimumLength = 2)]
         public string Description { get; set; }
 
         [DataType(DataType.Date)]
@@ -36,9 +35,8 @@ namespace RedmondBlog.Models
         [NotMapped]
         public IFormFile Image { get; set; }
 
-        //Navigation Property
-        [Display(Name = "Author")]
-        public virtual BlogUser BlogUser { get; set; }
+        //Navigation properties
+        public virtual BlogUser Author { get; set; }
         public virtual ICollection<Post> Posts { get; set; } = new HashSet<Post>();
     }
 }
