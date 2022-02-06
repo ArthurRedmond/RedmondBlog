@@ -36,6 +36,7 @@ namespace RedmondBlog.Models
         public IFormFile Image { get; set; }
 
         //Navigation properties
+        [Display(Name = "Author")]
         public virtual BlogUser Author { get; set; }
         public virtual ICollection<Post> Posts { get; set; } = new HashSet<Post>();
     }
