@@ -20,11 +20,27 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Comments
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> OriginalIndex()
         {
             var applicationDbContext = _context.Comments.Include(c => c.Author).Include(c => c.Moderator).Include(c => c.Post);
-            return View(await applicationDbContext.ToListAsync());
+            return View("Index", await applicationDbContext.ToListAsync());
         }
+
+        public async Task<IActionResult> ModeratedIndex()
+        {
+
+        }
+
+        public async Task<IActionResult> DeletedIndex()
+        {
+
+        }
+
+        //public async Task<IActionResult> Index()
+        //{
+        //    var applicationDbContext = _context.Comments.Include(c => c.Author).Include(c => c.Moderator).Include(c => c.Post);
+        //    return View(await applicationDbContext.ToListAsync());
+        //}
 
         // GET: Comments/Details/5
         public async Task<IActionResult> Details(int? id)
