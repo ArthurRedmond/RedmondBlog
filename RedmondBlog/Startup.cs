@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RedmondBlog.Data;
 using RedmondBlog.Models;
+using RedmondBlog.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,9 @@ namespace RedmondBlog
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            //Register my custom DataService class
+            services.AddScoped<DataService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
