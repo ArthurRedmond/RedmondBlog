@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using RedmondBlog.Data;
 using RedmondBlog.Enums;
 using RedmondBlog.Models;
@@ -24,6 +25,7 @@ namespace RedmondBlog.Services
 
         public async Task ManageDataAsync()
         {
+            await _dbContext.Database.MigrateAsync();
             await SeedRolesAsync();
             await SeedUsersAsync();
         }
@@ -54,6 +56,7 @@ namespace RedmondBlog.Services
                 UserName = "Arthur@ArthurRedmond.com",
                 FirstName = "Arthur",
                 LastName = "Redmond",
+                DisplayName = "Arthur",
                 EmailConfirmed = true
             };
 
@@ -67,6 +70,7 @@ namespace RedmondBlog.Services
                 UserName = "carshopper26@outlook.com",
                 FirstName = "Jon",
                 LastName = "Smith",
+                DisplayName = "Moderator",
                 EmailConfirmed = true
             };
 
