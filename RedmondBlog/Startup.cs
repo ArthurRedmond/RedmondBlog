@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using RedmondBlog.Data;
 using RedmondBlog.Models;
 using RedmondBlog.Services;
+using RedmondBlog.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,6 +52,10 @@ namespace RedmondBlog
 
             //Register my custom DataService class
             services.AddScoped<DataService>();
+
+            //Register a preconfigured instance of the MailSettings class
+            services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
+            services.AddScoped<IBlogEmailSender, EmailService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
