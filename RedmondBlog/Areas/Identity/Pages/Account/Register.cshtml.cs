@@ -7,6 +7,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -26,17 +27,20 @@ namespace RedmondBlog.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         //private readonly IEmailSender _emailSender;
         private readonly IBlogEmailSender _emailSender;
+        private readonly IImageService _imageService;
 
         public RegisterModel(
             UserManager<BlogUser> userManager,
             SignInManager<BlogUser> signInManager,
             ILogger<RegisterModel> logger,
-            IBlogEmailSender emailSender)
+            IBlogEmailSender emailSender,
+            IImageService imageService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _imageService = imageService;
         }
 
         [BindProperty]
@@ -48,6 +52,9 @@ namespace RedmondBlog.Areas.Identity.Pages.Account
 
         public class InputModel
         {
+            [Display(Name = "Custom Image")]
+            public IFormFile ImageFile { get; set; }
+
             [Required]
             [StringLength(50, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
             [Display(Name = "First Name")]
@@ -99,6 +106,7 @@ namespace RedmondBlog.Areas.Identity.Pages.Account
                     DisplayName = Input.DisplayName,
                     UserName = Input.Email,
                     Email = Input.Email
+                    ImageData = _imageService
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
