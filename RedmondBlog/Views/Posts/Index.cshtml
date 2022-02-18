@@ -1,4 +1,8 @@
-﻿@model IEnumerable<RedmondBlog.Models.Post>
+﻿@using RedmondBlog.Services
+@using RedmondBlog.Models
+
+@inject IImageService imageService
+@model IEnumerable<Post>
 
 @{
     ViewData["Title"] = "Index";
@@ -12,6 +16,9 @@
 <table class="table">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Image)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Title)
             </th>
@@ -33,6 +40,9 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td>
+                    <img class="img-fluid" width="200" src="@imageService.DecodeImage(item.ImageData, item.ContentType)" />
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Title)
                 </td>
