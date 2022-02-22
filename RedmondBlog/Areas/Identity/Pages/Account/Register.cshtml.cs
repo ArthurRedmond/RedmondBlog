@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RedmondBlog.Models;
 using RedmondBlog.Services;
@@ -28,19 +30,22 @@ namespace RedmondBlog.Areas.Identity.Pages.Account
         //private readonly IEmailSender _emailSender;
         private readonly IBlogEmailSender _emailSender;
         private readonly IImageService _imageService;
+        private readonly IConfiguration _configuration;
 
         public RegisterModel(
             UserManager<BlogUser> userManager,
             SignInManager<BlogUser> signInManager,
             ILogger<RegisterModel> logger,
             IBlogEmailSender emailSender,
-            IImageService imageService)
+            IImageService imageService,
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
             _imageService = imageService;
+            _configuration = configuration;
         }
 
         [BindProperty]
@@ -105,8 +110,12 @@ namespace RedmondBlog.Areas.Identity.Pages.Account
                     LastName = Input.LastName,
                     DisplayName = Input.DisplayName,
                     UserName = Input.Email,
-                    Email = Input.Email
-                    ImageData = _imageService
+                    Email = Input.Email,
+                    Image = await (_imageService.EncodeImageAsync(Input.ImageFile)) ??
+                            await _imageService.EncodeImageAsync(_configuration["DefaultUserImage"]),
+                    ContentType = Input.ImageFile is null ?
+                            Path.GetExtension(_configuration["DefaultUserImage"]) :
+                            _imageService.ContentType(Input.ImageFile)
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
