@@ -18,13 +18,13 @@ namespace RedmondBlog.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IImageService _imageService;
-        private readonly UserManager<BlogUser> _userManger;
+        private readonly UserManager<BlogUser> _userManager;
 
         public BlogsController(ApplicationDbContext context, IImageService imageService, UserManager<BlogUser> userManger)
         {
             _context = context;
             _imageService = imageService;
-            _userManger = userManger;
+            _userManager = userManger;
         }
 
         // GET: Blogs
@@ -70,7 +70,7 @@ namespace RedmondBlog.Controllers
             if (ModelState.IsValid)
             {
                 blog.Created = DateTime.Now;
-                blog.AuthorId = _userManger.GetUserId(User);
+                blog.AuthorId = _userManager.GetUserId(User);
                 blog.ImageData = await _imageService.EncodeImageAsync(blog.Image);
                 blog.ContentType = _imageService.ContentType(blog.Image);
                 _context.Add(blog);
