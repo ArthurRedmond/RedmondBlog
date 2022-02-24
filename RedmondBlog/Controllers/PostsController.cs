@@ -36,43 +36,43 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Posts/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var post = await _context.Posts
-                .Include(p => p.Author)
-                .Include(p => p.Blog)
-                .Include(p => p.Tags)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (post == null)
-            {
-                return NotFound();
-            }
-
-            return View(post);
-        }
-        //public async Task<IActionResult> Details(string slug)
+        //public async Task<IActionResult> Details(int? id)
         //{
-        //    if (string.IsNullOrEmpty(slug))
+        //    if (id == null)
         //    {
         //        return NotFound();
         //    }
 
         //    var post = await _context.Posts
-        //        .Include(p => p.Blog)
         //        .Include(p => p.Author)
+        //        .Include(p => p.Blog)
         //        .Include(p => p.Tags)
-        //        .FirstOrDefaultAsync(m => m.Slug == slug);
+        //        .FirstOrDefaultAsync(m => m.Id == id);
         //    if (post == null)
         //    {
         //        return NotFound();
         //    }
+
         //    return View(post);
         //}
+        public async Task<IActionResult> Details(string slug)
+        {
+            if (string.IsNullOrEmpty(slug))
+            {
+                return NotFound();
+            }
+
+            var post = await _context.Posts
+                .Include(p => p.Blog)
+                .Include(p => p.Author)
+                .Include(p => p.Tags)
+                .FirstOrDefaultAsync(m => m.Slug == slug);
+            if (post == null)
+            {
+                return NotFound();
+            }
+            return View(post);
+        }
 
         // GET: Posts/Create
         public IActionResult Create()
@@ -111,7 +111,7 @@ namespace RedmondBlog.Controllers
                 }
 
                 //Detect incoming duplicate slugs
-                if (!_slugService.IsUnique(slug))
+                else if (!_slugService.IsUnique(slug))
                 {
                     validationError = true;
                     ModelState.AddModelError("Title", "The Title you provided cannot be used as it results in a duplicate slug.");
