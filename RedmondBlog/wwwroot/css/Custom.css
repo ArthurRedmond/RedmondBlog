@@ -2,6 +2,11 @@ button.btn-sm, a.btn-sm {
     border-radius: 10px;
 }
 
+button.btn-sm-search, a.btn-sm-search {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
 option {
     font-weight: bolder;
 }
