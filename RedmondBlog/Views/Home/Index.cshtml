@@ -1,5 +1,9 @@
 ﻿@using RedmondBlog.Models
-@model IEnumerable<Blog>
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+
+@model IPagedList<Blog>
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -35,3 +39,21 @@
     </div>
 </div>
 
+<!-- Add paging controls here -->
+<div class="row mt-4 text-start">
+    <div class="col h5">
+        <!-- Page X of Y Text -->
+        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+    </div>
+</div>
+<!-- Clickable page navigation -->
+<div class="row">
+    <div class="col">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }),
+        new PagedListRenderOptionsBase
+        {
+            LiElementClasses = new string[] { "page-item" },
+            PageClasses = new string[] { "page-link" }
+        })
+    </div>
+</div>

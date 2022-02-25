@@ -10,6 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using RedmondBlog.Data;
 using RedmondBlog.Models;
 using RedmondBlog.Services;
+using RedmondBlog.Enums;
+using X.PagedList;
+using X.PagedList.Mvc;
+using X.PagedList.Web.Common;
 
 namespace RedmondBlog.Controllers
 {
@@ -36,16 +40,23 @@ namespace RedmondBlog.Controllers
         }
 
         //BlogPostIndex
-        public async Task<IActionResult> BlogPostIndex(int? id)
+        public async Task<IActionResult> BlogPostIndex(int? id, int? page)
         {
             if (id is null)
             {
                 return NotFound();
             }
 
-            var posts = _context.Posts.Where(p => p.BlogId == id).ToList();
+            var pageNumber = page ?? 1;
+            var pageSize = 5;
 
-            return View("Index", posts);
+            //var posts = _context.Posts.Where(p => p.BlogId == id).ToList();
+            var posts = await _context.Posts
+                .Where(p => p.BlogId == id && p.ReadyStatus == ReadyStatus.ProductionReady)
+                .OrderByDescending(p => p.Created)
+                .ToPagedListAsync(pageNumber, pageSize);
+
+            return View(posts);
         }
 
         // GET: Posts/Details/5
