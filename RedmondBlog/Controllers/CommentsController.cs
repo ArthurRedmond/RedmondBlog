@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,12 @@ namespace RedmondBlog.Controllers
     public class CommentsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<BlogUser> _userManager;
 
-        public CommentsController(ApplicationDbContext context)
+        public CommentsController(ApplicationDbContext context, UserManager<BlogUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Comments
@@ -43,6 +46,14 @@ namespace RedmondBlog.Controllers
         //    return View(await applicationDbContext.ToListAsync());
         //}
 
+        //Added on the fly below for Index()
+        public async Task<IActionResult> Index()
+        {
+            var allComments = await _context.Comments.ToListAsync();
+            return View(allComments);
+        }
+
+
         // GET: Comments/Create
         //public IActionResult Create()
         //{
@@ -57,10 +68,12 @@ namespace RedmondBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,PostId,AuthorId,ModeratorId,Body,Created,Updated,Moderated,Deleted,ModeratedBody,ModerationType")] Comment comment)
+        public async Task<IActionResult> Create([Bind("PostId,Body")] Comment comment)
         {
             if (ModelState.IsValid)
             {
+                comment.AuthorId = _userManager.GetUserId(User);
+                comment.Created = DateTime.Now;
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -93,7 +106,7 @@ namespace RedmondBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,PostId,AuthorId,ModeratorId,Body,Created,Updated,Moderated,Deleted,ModeratedBody,ModerationType")] Comment comment)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Body")] Comment comment)
         {
             if (id != comment.Id)
             {
@@ -102,9 +115,12 @@ namespace RedmondBlog.Controllers
 
             if (ModelState.IsValid)
             {
+                var newComment = await _context.Comments.Include(c => c.Post).FirstOrDefaultAsync(c => c.Id == comment.Id);
                 try
                 {
-                    _context.Update(comment);
+                    newComment.Body = comment.Body;
+                    newComment.Updated = DateTime.Now;
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -118,11 +134,12 @@ namespace RedmondBlog.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Posts", new { slug = newComment.Post.Slug }, "commentSection");
             }
-            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["ModeratorId"] = new SelectList(_context.Users, "Id", "Id", comment.ModeratorId);
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Abstract", comment.PostId);
+            //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
+            //ViewData["ModeratorId"] = new SelectList(_context.Users, "Id", "Id", comment.ModeratorId);
+            //ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Abstract", comment.PostId);
+
             return View(comment);
         }
 
