@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using RedmondBlog.Services
+@using RedmondBlog.Enums
 
 @model RedmondBlog.Models.Post
 
@@ -65,6 +66,7 @@
 
 <button id="commentSection" class="btn btn-sm btn-dark w-100">@Model.Comments.Count COMMENT(S)</button>
 
+@{ var counter = 0;}
 @foreach (var comment in Model.Comments)
 {
     <div class="d-flex media media-border p-0 mb-2 bg-light">
@@ -72,20 +74,66 @@
             <img src="@imageService.DecodeImage(comment.Author.Image,comment.Author.ContentType)" class="rounded-circle mt-3 mr-3" style="width:60px;">
         </div>
         <div class="flex-grow-1 ms-3 mt-3">
-            <h5>@comment.Author.FullName</h5>
-            <small class="text-muted"><i>Posted on @comment.Created.ToString("MMM dd, yyyy")</i></small>
-            <p>@comment.Body</p>
+            <h4>@comment.Author.FullName</h4>
 
+            <small>
+                <i>
+                    @if (comment.Moderated is not null)
+                    {
+                        <span class="small">
+                            <span class="fw-bolder">
+                                Moderated <span class="text-danger fst-italic">(@comment.ModerationType.ToString().ToLower())</span>
+                            </span>
+                            : @comment.Moderated?.ToString("MMM dd, yyyy")
+                        </span>
+                    }
+                    else
+                    {
+                        <small class="text-muted"><i>Posted on @comment.Created.ToString("MMM dd, yyyy")</i></small>
+                    }
+                </i>
+            </small>
+
+            @if (comment.Moderated is not null)
+            {
+                <p>@comment.ModeratedBody</p>
+            }
+            else
+            {
+                <p>@comment.Body</p>
+            }
+
+            @*Renders the edit button *@
             @if (comment.Moderated is null && comment.Deleted is null && comment.AuthorId == userManager.GetUserId(User))
             {
                 <hr />
-                <button data-bs-toggle="modal" data-bs-target="#editModal" class="btn-sm btn-dark float-end fw-bold">EDIT</button>
+                <button data-bs-toggle="modal" data-bs-target="@($"#editModal{counter}")" class="mt-2 btn-sm btn-dark float-end fw-bold">EDIT</button>
             }
+
+            @*Renders the moderate and delete buttons *@
+            @if (User.IsInRole(BlogRole.Moderator.ToString()) && comment.Deleted is null)
+            {
+                <hr />
+                <div class="row">
+                    <div class="col-2">
+                        <button class="btn-sm btn-dark fw-bold w-100" data-bs-toggle="modal" data-bs-target="@($"#moderatedModal{counter}")">MODERATE</button>
+                    </div>
+                    <div class="col-2">
+                        <form asp-action="Delete" asp-controller="Comments">
+                            @Html.Hidden("Id", comment.Id)
+                            @Html.Hidden("Slug", comment.Post.Slug)
+                            <button type="submit" class="btn-sm btn-dark fw-bold w-100">DELETE</button>
+                        </form>
+                    </div>
+                </div>
+            }
+
         </div>
     </div>
 
     @*Modals*@
-    <div class="modal" id="editModal">
+    <!-- Edit Modal -->
+    <div class="modal" id="@($"editModal{counter}")">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -98,14 +146,65 @@
                         <div class="form-group">
                             <textarea name="Body" class="form-control" required>@comment.Body</textarea>
                         </div>
-                        <button class="mt-2 btn-sm btn-dark border-success fw-bold" type="submit">SUBMIT</button>
+                        <!-- Modal Footer-->
+                        <div class="modal-footer">
+                            <div class="row">
+                                <div class="col">
+                                    <button class="btn-sm btn-dark border-success fw-bold w-100" type="submit">SUBMIT</button>
+                                </div>
+                                <div class="col">
+                                    <button type="button" class="btn-sm btn-dark fw-bold w-100" data-bs-dismiss="modal">CLOSE</button>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
-                <!-- Modal Footer-->
-                <div class="modal-footer">
-                    <button type="button" class="btn-sm btn-dark fw-bold" data-bs-dismiss="modal">CLOSE</button>
-                </div>
+
             </div>
         </div>
     </div>
+
+    <!-- Moderate Modal -->
+    <div class="modal" id="@($"moderatedModal{counter}")">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Moderating Comment...</h4>
+                </div>
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <form asp-action="Moderate" asp-controller="Comments">
+                        @Html.Hidden("Id", comment.Id)
+                        @Html.Hidden("Body", comment.Body)
+
+                        <div class="form-group">
+                            <label class="control-label">Original Message</label>
+                            <textarea disabled class="form-control" style="resize:none">@comment.Body</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Moderated Comment</label>
+                            <textarea required name="ModeratedBody" class="form-control">@comment.ModeratedBody</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Reason For Moderation</label>
+                            <select class="form-control" asp-for="@comment.ModerationType" name="ModerationType" asp-items="Html.GetEnumSelectList<ModerationType>()"></select>
+                        </div>
+                        <!-- Modal Footer-->
+                        <div class="modal-footer">
+                            <div class="row">
+                                <div class="col">
+                                    <button class="btn-sm btn-dark border-success fw-bold w-100" type="submit">SUBMIT</button>
+                                </div>
+                                <div class="col">
+                                    <button type="button" class="btn-sm btn-dark fw-bold w-100" data-bs-dismiss="modal">CLOSE</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    counter++;
 }
