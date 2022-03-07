@@ -14,6 +14,7 @@ using RedmondBlog.Enums;
 using X.PagedList;
 using X.PagedList.Mvc;
 using X.PagedList.Web.Common;
+using RedmondBlog.ViewModels;
 
 namespace RedmondBlog.Controllers
 {
@@ -75,6 +76,36 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Posts/Details/5
+        public async Task<IActionResult> Details(string slug)
+        {
+            ViewData["Title"] = "Post Details Page";
+            if (string.IsNullOrEmpty(slug)) return NotFound();
+
+            var post = await _context.Posts
+                .Include(p => p.Author)
+                .Include(p => p.Tags)
+                .Include(p => p.Comments)
+                .ThenInclude(c => c.Author)
+                .Include(p => p.Comments)
+                .ThenInclude(c => c.Moderator)
+                .FirstOrDefaultAsync(m => m.Slug == slug);
+
+            if (post == null) return NotFound();
+
+            var dataVM = new PostDetailViewModel()
+            {
+                Post = post,
+                Tags = _context.Tags
+                        .Select(t => t.Text.ToLower())
+                        .Distinct().ToList()
+            };
+
+            ViewData["HeaderImage"] = _imageService.DecodeImage(post.ImageData, post.ContentType);
+            ViewData["MainText"] = post.Title;
+            ViewData["SubText"] = post.Abstract;
+            return View(dataVM);
+        }
+
         //public async Task<IActionResult> Details(int? id)
         //{
         //    if (id == null)
@@ -94,26 +125,26 @@ namespace RedmondBlog.Controllers
 
         //    return View(post);
         //}
-        public async Task<IActionResult> Details(string slug)
-        {
-            if (string.IsNullOrEmpty(slug))
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Details(string slug)
+        //{
+        //    if (string.IsNullOrEmpty(slug))
+        //    {
+        //        return NotFound();
+        //    }
 
-            var post = await _context.Posts
-                .Include(p => p.Blog)
-                .Include(p => p.Author)
-                .Include(p => p.Tags)
-                .Include(p => p.Comments)
-                .ThenInclude(c => c.Author)
-                .FirstOrDefaultAsync(m => m.Slug == slug);
-            if (post == null)
-            {
-                return NotFound();
-            }
-            return View(post);
-        }
+        //    var post = await _context.Posts
+        //        .Include(p => p.Blog)
+        //        .Include(p => p.Author)
+        //        .Include(p => p.Tags)
+        //        .Include(p => p.Comments)
+        //        .ThenInclude(c => c.Author)
+        //        .FirstOrDefaultAsync(m => m.Slug == slug);
+        //    if (post == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(post);
+        //}
 
         // GET: Posts/Create
         public IActionResult Create()
