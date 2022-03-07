@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -23,52 +24,32 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Comments
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> OriginalIndex()
         {
             var originalComments = await _context.Comments.ToListAsync();
             return View("Index", originalComments);
         }
 
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> ModeratedIndex()
         {
             var moderatedComments = await _context.Comments.Where(c => c.Moderated != null).ToListAsync();
             return View("Index", moderatedComments);
         }
 
-        //public async Task<IActionResult> DeletedIndex()
-        //{
-
-        //}
-
-        //public async Task<IActionResult> Index()
-        //{
-        //    var applicationDbContext = _context.Comments.Include(c => c.Author).Include(c => c.Moderator).Include(c => c.Post);
-        //    return View(await applicationDbContext.ToListAsync());
-        //}
-
         //Added on the fly below for Index()
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Index()
         {
             var allComments = await _context.Comments.ToListAsync();
             return View(allComments);
         }
 
-
-        // GET: Comments/Create
-        //public IActionResult Create()
-        //{
-        //    ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id");
-        //    ViewData["ModeratorId"] = new SelectList(_context.Users, "Id", "Id");
-        //    ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Abstract");
-        //    return View();
-        //}
-
         // POST: Comments/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PostId,Body")] Comment comment)
+        public async Task<IActionResult> Create([Bind("PostId,Body")] Comment comment, string slug)
         {
             if (ModelState.IsValid)
             {
@@ -76,7 +57,7 @@ namespace RedmondBlog.Controllers
                 comment.Created = DateTime.Now;
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Posts", new { slug }, "commentSection");
             }
 
             return View(comment);
@@ -102,8 +83,6 @@ namespace RedmondBlog.Controllers
         }
 
         // POST: Comments/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Body")] Comment comment)
@@ -115,7 +94,9 @@ namespace RedmondBlog.Controllers
 
             if (ModelState.IsValid)
             {
-                var newComment = await _context.Comments.Include(c => c.Post).FirstOrDefaultAsync(c => c.Id == comment.Id);
+                var newComment = await _context.Comments
+                    .Include(c => c.Post)
+                    .FirstOrDefaultAsync(c => c.Id == comment.Id);
                 try
                 {
                     newComment.Body = comment.Body;
@@ -136,10 +117,9 @@ namespace RedmondBlog.Controllers
                 }
                 return RedirectToAction("Details", "Posts", new { slug = newComment.Post.Slug }, "commentSection");
             }
-            //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            //ViewData["ModeratorId"] = new SelectList(_context.Users, "Id", "Id", comment.ModeratorId);
-            //ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Abstract", comment.PostId);
-
+            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
+            ViewData["ModeratorId"] = new SelectList(_context.Users, "Id", "Id", comment.ModeratorId);
+            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Abstract", comment.PostId);
             return View(comment);
         }
 
@@ -154,7 +134,9 @@ namespace RedmondBlog.Controllers
 
             if (ModelState.IsValid)
             {
-                var newComment = await _context.Comments.Include(c => c.Post).FirstOrDefaultAsync(c => c.Id == comment.Id);
+                var newComment = await _context.Comments
+                    .Include(c => c.Post)
+                    .FirstOrDefaultAsync(c => c.Id == comment.Id);
                 try
                 {
                     newComment.ModeratedBody = comment.ModeratedBody;
@@ -183,6 +165,7 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Comments/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -204,6 +187,7 @@ namespace RedmondBlog.Controllers
         }
 
         // POST: Comments/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id, string slug)

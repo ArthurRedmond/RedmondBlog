@@ -28,6 +28,7 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Blogs
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Blogs.Include(b => b.Author);
@@ -35,6 +36,7 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Blogs/Details/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -61,8 +63,7 @@ namespace RedmondBlog.Controllers
         }
 
         // POST: Blogs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Description,Image")] Blog blog)
@@ -83,6 +84,7 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Blogs/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -101,6 +103,7 @@ namespace RedmondBlog.Controllers
         // POST: Blogs/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Blog blog, IFormFile newImage)
@@ -128,6 +131,7 @@ namespace RedmondBlog.Controllers
                     if (newImage is not null)
                     {
                         newBlog.ImageData = await _imageService.EncodeImageAsync(newImage);
+                        newBlog.ContentType = _imageService.ContentType(newImage);
                     }
 
                     await _context.SaveChangesAsync();
@@ -150,6 +154,7 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Blogs/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -169,6 +174,7 @@ namespace RedmondBlog.Controllers
         }
 
         // POST: Blogs/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
