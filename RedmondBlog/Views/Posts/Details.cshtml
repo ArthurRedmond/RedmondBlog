@@ -8,6 +8,28 @@
 @inject UserManager<BlogUser> userManager
 @model PostDetailViewModel
 
+@{
+    ViewData["Title"] = "Post";
+}
+
+@if (User.IsInRole(BlogRole.Administrator.ToString()))
+{
+    @*Edit button*@
+    <div class="text-center">
+        <a class="btn btn-success btn-sm w-100 mb-2"
+           asp-action="Edit"
+           asp-controller="Posts"
+           asp-route-id="@Model.Post.Id">Edit Post</a>
+    </div>
+    @*Delete button*@
+    <div class="text-center">
+        <a class="btn btn-danger btn-sm w-100 mb-2"
+           asp-action="Delete"
+           asp-controller="Posts"
+           asp-route-id="@Model.Post.Id">Delete Post</a>
+    </div>
+}
+
 <article>
     <div class="row">
         <div class="col-9 border-right">
@@ -21,7 +43,11 @@
                     <div class="tagView">
                         @foreach (var tag in Model.Tags)
                         {
-                            <a asp-action="TagIndex" asp-route-tag="@tag" class="mb-1 btn btn-sm btn-warning btn-outline-dark">#@tag</a>
+                            @*<a asp-action="TagIndex" asp-route-tag="@tag" class="mb-1 btn btn-sm btn-warning btn-outline-dark">#@tag</a>*@
+                            <form asp-action="TagIndex" method="post" class="d-inline-block">
+                                @Html.Hidden("SearchTag", tag)
+                                <button type="submit" class="mb-1 btn btn-sm btn-warning btn-outline-dark">#@tag</button>
+                            </form>
                         }
                     </div>
                 </div>
