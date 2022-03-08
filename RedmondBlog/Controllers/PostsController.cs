@@ -65,7 +65,7 @@ namespace RedmondBlog.Controllers
             ViewData["SearchTag"] = searchTag;
 
             var pageNumber = page ?? 1;
-            var pageSize = 5;
+            var pageSize = 6;
 
             var posts = _context.Posts.Include(p => p.Tags).Where(
                 p => p.ReadyStatus == ReadyStatus.ProductionReady &&
@@ -93,7 +93,7 @@ namespace RedmondBlog.Controllers
             ViewData["Title"] = "Blogs";
 
             var pageNumber = page ?? 1;
-            var pageSize = 5;
+            var pageSize = 6;
 
             var blog = await _context.Blogs
                 .Where(b => b.Id == id)

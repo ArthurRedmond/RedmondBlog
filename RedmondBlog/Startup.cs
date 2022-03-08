@@ -91,7 +91,7 @@ namespace RedmondBlog
             {
                 endpoints.MapControllerRoute(
                     name: "SlugRoute",
-                    pattern: "BlogPosts/UrlFriendly/{slug}",
+                    pattern: "BlogPosts/{slug}",
                     defaults: new { controller = "Posts", action = "Details" });
 
                 endpoints.MapControllerRoute(

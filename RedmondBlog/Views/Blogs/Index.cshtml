@@ -30,9 +30,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.ImageData)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Author)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -53,10 +50,7 @@
                     @Html.DisplayFor(modelItem => item.Updated)
                 </td>
                 <td>
-                    <img class="img-fluid" width="200px;" src ="@imageService.DecodeImage(item.ImageData, item.ContentType)"/>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Author.FullName)
+                    <img class="img-fluid" width="200px;" src="@imageService.DecodeImage(item.ImageData, item.ContentType)" />
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
