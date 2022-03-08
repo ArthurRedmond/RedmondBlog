@@ -15,6 +15,7 @@ using X.PagedList;
 using X.PagedList.Mvc;
 using X.PagedList.Web.Common;
 using RedmondBlog.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RedmondBlog.Controllers
 {
@@ -38,6 +39,12 @@ namespace RedmondBlog.Controllers
 
         public async Task<IActionResult> SearchIndex(int? page, string searchTerm)
         {
+
+            if (searchTerm is null)
+            {
+                return NotFound();
+            }
+
             ViewData["SearchTerm"] = searchTerm;
 
             var pageNumber = page ?? 1;
@@ -48,10 +55,30 @@ namespace RedmondBlog.Controllers
             return View(await posts.ToPagedListAsync(pageNumber, pageSize));
         }
 
+        public async Task<IActionResult> TagIndex(int? page, string searchTag)
+        {
+            if (searchTag is null)
+            {
+                return NotFound();
+            }
+
+            ViewData["SearchTag"] = searchTag;
+
+            var pageNumber = page ?? 1;
+            var pageSize = 5;
+
+            var posts = _context.Posts.Include(p => p.Tags).Where(
+                p => p.ReadyStatus == ReadyStatus.ProductionReady &&
+                p.Tags.Any(t => t.Text.Contains(searchTag)));
+
+            return View(await posts.ToPagedListAsync(pageNumber, pageSize));
+        }
+
         // GET: Posts
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Posts.Include(p => p.Author).Include(p => p.Blog);
+            var applicationDbContext = _context.Posts.Include(p => p.Blog).Include(p => p.Author);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -63,14 +90,23 @@ namespace RedmondBlog.Controllers
                 return NotFound();
             }
 
+            ViewData["Title"] = "Blogs";
+
             var pageNumber = page ?? 1;
             var pageSize = 5;
 
-            //var posts = _context.Posts.Where(p => p.BlogId == id).ToList();
+            var blog = await _context.Blogs
+                .Where(b => b.Id == id)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             var posts = await _context.Posts
                 .Where(p => p.BlogId == id && p.ReadyStatus == ReadyStatus.ProductionReady)
                 .OrderByDescending(p => p.Created)
                 .ToPagedListAsync(pageNumber, pageSize);
+
+            ViewData["HeaderImage"] = _imageService.DecodeImage(blog.ImageData, blog.ContentType);
+            ViewData["MainText"] = blog.Name;
+            ViewData["SubText"] = blog.Description;
 
             return View(posts);
         }
@@ -78,7 +114,7 @@ namespace RedmondBlog.Controllers
         // GET: Posts/Details/5
         public async Task<IActionResult> Details(string slug)
         {
-            ViewData["Title"] = "Post Details Page";
+            ViewData["Title"] = "Blog Post";
             if (string.IsNullOrEmpty(slug)) return NotFound();
 
             var post = await _context.Posts
@@ -106,47 +142,8 @@ namespace RedmondBlog.Controllers
             return View(dataVM);
         }
 
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var post = await _context.Posts
-        //        .Include(p => p.Author)
-        //        .Include(p => p.Blog)
-        //        .Include(p => p.Tags)
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (post == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(post);
-        //}
-        //public async Task<IActionResult> Details(string slug)
-        //{
-        //    if (string.IsNullOrEmpty(slug))
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var post = await _context.Posts
-        //        .Include(p => p.Blog)
-        //        .Include(p => p.Author)
-        //        .Include(p => p.Tags)
-        //        .Include(p => p.Comments)
-        //        .ThenInclude(c => c.Author)
-        //        .FirstOrDefaultAsync(m => m.Slug == slug);
-        //    if (post == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(post);
-        //}
-
         // GET: Posts/Create
+        [Authorize("Administrator")]
         public IActionResult Create()
         {
             ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id");
@@ -155,8 +152,7 @@ namespace RedmondBlog.Controllers
         }
 
         // POST: Posts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize("Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BlogId,Title,Abstract,Content,ReadyStatus,Image")] Post post, List<string> tagValues)
@@ -221,6 +217,7 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Posts/Edit/5
+        [Authorize("Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -228,11 +225,15 @@ namespace RedmondBlog.Controllers
                 return NotFound();
             }
 
-            var post = await _context.Posts.Include(p => p.Tags).FirstOrDefaultAsync(p => p.Id == id);
+            var post = await _context.Posts
+                .Include(p => p.Tags)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             if (post == null)
             {
                 return NotFound();
             }
+
             ViewData["BlogId"] = new SelectList(_context.Blogs, "Id", "Name", post.BlogId);
             ViewData["TagValues"] = string.Join(",", post.Tags.Select(t => t.Text));
 
@@ -240,8 +241,7 @@ namespace RedmondBlog.Controllers
         }
 
         // POST: Posts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize("Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Title,Abstract,Content,ReadyStatus")] Post post, IFormFile newImage, List<string> tagValues)
@@ -256,7 +256,9 @@ namespace RedmondBlog.Controllers
                 try
                 {
                     //Get a copy of the original post
-                    var newPost = await _context.Posts.Include(p => p.Tags).FirstOrDefaultAsync(p => p.Id == post.Id);
+                    var newPost = await _context.Posts
+                        .Include(p => p.Tags)
+                        .FirstOrDefaultAsync(p => p.Id == post.Id);
 
                     newPost.Updated = DateTime.Now;
                     newPost.Title = post.Title;
@@ -321,6 +323,7 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Posts/Delete/5
+        [Authorize("Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -341,6 +344,7 @@ namespace RedmondBlog.Controllers
         }
 
         // POST: Posts/Delete/5
+        [Authorize("Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
