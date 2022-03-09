@@ -143,7 +143,7 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Posts/Create
-        [Authorize("Administrator")]
+        [Authorize(Roles ="Administrator")]
         public IActionResult Create()
         {
             ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id");
@@ -152,7 +152,7 @@ namespace RedmondBlog.Controllers
         }
 
         // POST: Posts/Create
-        [Authorize("Administrator")]
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BlogId,Title,Abstract,Content,ReadyStatus,Image")] Post post, List<string> tagValues)
@@ -217,7 +217,7 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Posts/Edit/5
-        [Authorize("Administrator")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -241,7 +241,7 @@ namespace RedmondBlog.Controllers
         }
 
         // POST: Posts/Edit/5
-        [Authorize("Administrator")]
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Title,Abstract,Content,ReadyStatus")] Post post, IFormFile newImage, List<string> tagValues)
@@ -323,7 +323,7 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Posts/Delete/5
-        [Authorize("Administrator")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -344,7 +344,7 @@ namespace RedmondBlog.Controllers
         }
 
         // POST: Posts/Delete/5
-        [Authorize("Administrator")]
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
