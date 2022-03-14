@@ -55,25 +55,6 @@ namespace RedmondBlog.Controllers
             return View(await posts.ToPagedListAsync(pageNumber, pageSize));
         }
 
-        //public async Task<IActionResult> TagIndex(int? page, string searchTag)
-        //{
-        //    if (searchTag is null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    ViewData["SearchTag"] = searchTag;
-
-        //    var pageNumber = page ?? 1;
-        //    var pageSize = 6;
-
-        //    var posts = _context.Posts.Include(p => p.Tags).Where(
-        //        p => p.ReadyStatus == ReadyStatus.ProductionReady &&
-        //        p.Tags.Any(t => t.Text.Contains(searchTag)))
-        //        .ToPagedListAsync(pageNumber, pageSize);
-
-        //    return View(await posts);
-        //}
         public async Task<IActionResult> TagIndex(int? page, string searchTag)
         {
 
