@@ -38,5 +38,21 @@ namespace RedmondBlog.Services
             return posts.OrderByDescending(p => p.Created);
 
         }
+
+        public IQueryable<Post> SearchTag(string searchTag)
+        {
+            var posts = _context.Posts.Where(p => p.ReadyStatus == ReadyStatus.ProductionReady).AsQueryable();
+
+            if (searchTag != null)
+            {
+                searchTag = searchTag.ToLower();
+
+                posts = posts.Where(p => p.Tags.Any(t => t.Text.ToLower().Contains(searchTag)))
+                             .Where(p => p.ReadyStatus == ReadyStatus.ProductionReady);
+            }
+
+            return posts.OrderByDescending(p => p.Created);
+        }
+
     }
 }

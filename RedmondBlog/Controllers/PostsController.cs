@@ -55,8 +55,28 @@ namespace RedmondBlog.Controllers
             return View(await posts.ToPagedListAsync(pageNumber, pageSize));
         }
 
+        //public async Task<IActionResult> TagIndex(int? page, string searchTag)
+        //{
+        //    if (searchTag is null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    ViewData["SearchTag"] = searchTag;
+
+        //    var pageNumber = page ?? 1;
+        //    var pageSize = 6;
+
+        //    var posts = _context.Posts.Include(p => p.Tags).Where(
+        //        p => p.ReadyStatus == ReadyStatus.ProductionReady &&
+        //        p.Tags.Any(t => t.Text.Contains(searchTag)))
+        //        .ToPagedListAsync(pageNumber, pageSize);
+
+        //    return View(await posts);
+        //}
         public async Task<IActionResult> TagIndex(int? page, string searchTag)
         {
+
             if (searchTag is null)
             {
                 return NotFound();
@@ -67,9 +87,7 @@ namespace RedmondBlog.Controllers
             var pageNumber = page ?? 1;
             var pageSize = 6;
 
-            var posts = _context.Posts.Include(p => p.Tags).Where(
-                p => p.ReadyStatus == ReadyStatus.ProductionReady &&
-                p.Tags.Any(t => t.Text.Contains(searchTag)));
+            var posts = _blogSearchService.SearchTag(searchTag);
 
             return View(await posts.ToPagedListAsync(pageNumber, pageSize));
         }
@@ -118,6 +136,7 @@ namespace RedmondBlog.Controllers
             if (string.IsNullOrEmpty(slug)) return NotFound();
 
             var post = await _context.Posts
+                .Include(p => p.Blog)
                 .Include(p => p.Author)
                 .Include(p => p.Tags)
                 .Include(p => p.Comments)
@@ -143,7 +162,7 @@ namespace RedmondBlog.Controllers
         }
 
         // GET: Posts/Create
-        [Authorize(Roles ="Administrator")]
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id");
@@ -261,6 +280,7 @@ namespace RedmondBlog.Controllers
                         .FirstOrDefaultAsync(p => p.Id == post.Id);
 
                     newPost.Updated = DateTime.Now;
+                    newPost.BlogId = post.BlogId;
                     newPost.Title = post.Title;
                     newPost.Abstract = post.Abstract;
                     newPost.Content = post.Content;

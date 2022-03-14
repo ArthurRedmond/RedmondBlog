@@ -14,19 +14,21 @@
 
 @if (User.IsInRole(BlogRole.Administrator.ToString()))
 {
-    @*Edit button*@
-    <div class="text-center">
-        <a class="btn btn-success btn-sm w-100 mb-2"
-           asp-action="Edit"
-           asp-controller="Posts"
-           asp-route-id="@Model.Post.Id">Edit Post</a>
-    </div>
-    @*Delete button*@
-    <div class="text-center">
-        <a class="btn btn-danger btn-sm w-100 mb-2"
-           asp-action="Delete"
-           asp-controller="Posts"
-           asp-route-id="@Model.Post.Id">Delete Post</a>
+    <div class="row">
+        @*Edit button*@
+        <div class="text-center col-2">
+            <a class="btn btn-success btn-sm w-100 mb-2"
+               asp-action="Edit"
+               asp-controller="Posts"
+               asp-route-id="@Model.Post.Id">Edit Post</a>
+        </div>
+        @*Delete button*@
+        <div class="text-center col-2">
+            <a class="btn btn-danger btn-sm w-100 mb-2"
+               asp-action="Delete"
+               asp-controller="Posts"
+               asp-route-id="@Model.Post.Id">Delete Post</a>
+        </div>
     </div>
 }
 
@@ -44,7 +46,7 @@
                         @foreach (var tag in Model.Tags)
                         {
                             @*<a asp-action="TagIndex" asp-route-tag="@tag" class="mb-1 btn btn-sm btn-warning btn-outline-dark">#@tag</a>*@
-                            <form asp-action="TagIndex" method="post" class="d-inline-block">
+                            <form asp-action="TagIndex" asp-controller="Posts" method="post" class="d-inline">
                                 @Html.Hidden("SearchTag", tag)
                                 <button type="submit" class="mb-1 btn btn-sm btn-warning btn-outline-dark">#@tag</button>
                             </form>
@@ -59,12 +61,21 @@
 
 <article>
     <hr />
-    <h3 class="text-center font-weight-bold">Tags</h3>
-    <div class="col text-center">
-        @foreach (var tag in Model.Post.Tags.ToList())
-        {
-            <a asp-action="TagIndex" asp-route-tag="@tag.Text.ToLower()" class="mb-1 btn btn-sm btn-warning btn-outline-dark">#@tag.Text</a>
-        }
+    <div class="row">
+        <div class="col text-center font-weight-bold h3">Post Tags</div>
+    </div>
+    <div class="row">
+        <div class="col text-center">
+            @foreach (var tag in Model.Post.Tags.ToList())
+            {
+                @*<a asp-action="TagIndex" asp-route-tag="@tag.Text.ToLower()" asp-controller="Posts" class="mb-1 btn btn-sm btn-warning btn-outline-dark">#@tag.Text</a>*@
+                @*<a asp-controller="Posts" asp-action="TagIndex" name="SearchTag" class="mb-1 btn btn-sm btn-warning btn-outline-dark">#@tag.Text</a>*@
+                <form asp-action="TagIndex" asp-controller="Posts" method="post" class="d-inline">
+                    @Html.Hidden("SearchTag", tag.Text)
+                    <button type="submit" class="mb-1 btn btn-sm btn-warning btn-outline-dark">#@tag.Text</button>
+                </form>
+            }
+        </div>
     </div>
     <hr />
 </article>
