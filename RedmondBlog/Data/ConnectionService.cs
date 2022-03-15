@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace RedmondBlog.Data
 {
-    public class ConnectionService
+    public static class ConnectionService
     {
         // Public connection method. GetConnectionString of connectionString and databaseUrl
         // BuildConnectionString(databaseUrl) or if null, return DefaultConnection
@@ -22,7 +22,7 @@ namespace RedmondBlog.Data
             var userInfo = databaseUri.UserInfo.Split(':');
 
             // Build and return new NpgsqlConnectionStringBuilder() based on databaseUri and userInfo 
-            return new NpgsqlConnectionStringBuilder()
+            return new NpgsqlConnectionStringBuilder
             {
                 Host = databaseUri.Host,
                 Port = databaseUri.Port,
