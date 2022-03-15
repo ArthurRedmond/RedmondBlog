@@ -25,7 +25,6 @@ namespace RedmondBlog
                                     .GetRequiredService<DataService>();
 
             await dataService.ManageDataAsync();
-
             host.Run();
         }
 
