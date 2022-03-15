@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using RedmondBlog.Data;
+﻿using RedmondBlog.Data;
 using RedmondBlog.Enums;
 using RedmondBlog.Models;
+using System.Linq;
 
 namespace RedmondBlog.Services
 {

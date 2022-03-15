@@ -1,21 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RedmondBlog.Data;
+using RedmondBlog.Enums;
 using RedmondBlog.Models;
 using RedmondBlog.Services;
-using RedmondBlog.Enums;
-using X.PagedList;
-using X.PagedList.Mvc;
-using X.PagedList.Web.Common;
 using RedmondBlog.ViewModels;
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using X.PagedList;
 
 namespace RedmondBlog.Controllers
 {
