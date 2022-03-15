@@ -55,20 +55,20 @@ namespace RedmondBlog.Controllers
             return View(await posts.ToPagedListAsync(pageNumber, pageSize));
         }
 
-        public async Task<IActionResult> TagIndex(int? page, string searchTag)
+        public async Task<IActionResult> TagIndex(int? page, string tag)
         {
 
-            if (searchTag is null)
+            if (tag is null)
             {
                 return NotFound();
             }
 
-            ViewData["SearchTag"] = searchTag;
+            ViewData["SearchTag"] = tag;
 
             var pageNumber = page ?? 1;
             var pageSize = 6;
 
-            var posts = _blogSearchService.SearchTag(searchTag);
+            var posts = _blogSearchService.SearchTag(tag);
 
             return View(await posts.ToPagedListAsync(pageNumber, pageSize));
         }
