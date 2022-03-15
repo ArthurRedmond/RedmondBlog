@@ -9,7 +9,7 @@
 @model PostDetailViewModel
 
 @{
-    ViewData["Title"] = "Post";
+    ViewData["Title"] = Model.Post.Title;
 }
 
 @if (User.IsInRole(BlogRole.Administrator.ToString()))
@@ -108,9 +108,6 @@
             <div class="media-body">
                 <h4>@comment.Author.FullName</h4>
 
-                @****************************************************************
-                    SECTION 1: POST ON OR UPDATED ON
-                    *****************************************************************@
                 @if (comment.Deleted is not null)
                 {
                     <span class="small">
@@ -138,13 +135,6 @@
                         <span class="font-weight-bolder">Created </span> : @comment.Created.ToString("MMM dd, yyyy")
                     </span>
                 }
-
-                @*****************************************************************
-                    SECTION 2: HOW DO WE COMPOSE THE BODY
-                    *****************************************************************@
-                @*****************************************************************
-                    SECTION 2A: Render pre text
-                    *****************************************************************@
                 <br />
                 @if (comment.Deleted is not null)
                 {
@@ -156,10 +146,7 @@
                 }
 
                 <hr />
-
-                @*****************************************************************
-                    SECTION 2B: Render main body
-                    *****************************************************************@
+             
                 @if (string.IsNullOrEmpty(comment.Body))
                 {
                     <span class="small font-italic">Comment not available...</span>
@@ -173,19 +160,12 @@
                     @comment.Body
                 }
 
-
-                @****************************************************************
-                        SECTION 3: CAN WE RENDER THE EDIT BUTTON
-                    *****************************************************************@
                 @if (comment.Moderated is null && comment.Deleted is null && comment.AuthorId == userManager.GetUserId(User))
                 {
                     <hr>
                     <button data-toggle="modal" data-target="#editModal" class="btn-sm btn-dark float-right font-weight-bold">EDIT</button>
                 }
 
-                @****************************************************************
-                    SECTION 4: CAN WE RENDER THE MODERATE AND DELETE BUTTONS
-                    *****************************************************************@
                 @if (User.IsInRole(BlogRole.Moderator.ToString()) && comment.Deleted is null)
                 {
                     <hr>

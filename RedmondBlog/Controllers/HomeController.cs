@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RedmondBlog.Data;
 using RedmondBlog.Models;
@@ -25,6 +26,7 @@ namespace RedmondBlog.Controllers
             _logger = logger;
             _emailSender = emailSender;
             _context = context;
+
         }
 
         public async Task<IActionResult> Index(int? page)
@@ -38,8 +40,8 @@ namespace RedmondBlog.Controllers
                 .OrderByDescending(b => b.Created)
                 .ToPagedListAsync(pageNumber, pageSize);
 
+            ViewData["MainText"] = "Welcome to the Freakshow";
             return View(await blogs);
-
         }
 
         public IActionResult About()
