@@ -11,7 +11,7 @@
 @model IPagedList<Post>
 
 @{
-    ViewData["Title"] = "Tags";
+    ViewData["Title"] = $"#{ViewData["SearchTag"].ToString()}";
 }
 
 <h3 class="text-center">#@ViewData["SearchTag"].ToString() Posts</h3>
@@ -19,7 +19,7 @@
 <div class="row">
     @foreach (var post in Model)
     {
-        <div class="col-sm-2 col-lg-4 mt-3">
+        <div class="col-sm-6 col-lg-4 mt-3">
             <div class="card border-dark">
                 <div class="card-body text-center">
                     <div class="bg-warning">
