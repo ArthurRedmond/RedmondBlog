@@ -40,7 +40,7 @@ namespace RedmondBlog.Controllers
                 .OrderByDescending(b => b.Created)
                 .ToPagedListAsync(pageNumber, pageSize);
 
-            ViewData["MainText"] = "Welcome to the Freakshow";
+            ViewData["MainText"] = "Still under construction. Please check back soon.";
             return View(await blogs);
         }
 
