@@ -68,6 +68,11 @@ namespace RedmondBlog.Controllers
 
             var posts = _blogSearchService.SearchTag(tag);
 
+            var tagsImage = _imageService.EncodeImageAsync($"tags.png");
+            var tagsType = "png";
+
+            ViewData["HeaderImage"] = _imageService.DecodeImage(await tagsImage, tagsType);
+
             return View(await posts.ToPagedListAsync(pageNumber, pageSize));
         }
 
