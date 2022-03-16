@@ -9,6 +9,7 @@ using RedmondBlog.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using X.PagedList;
@@ -20,13 +21,17 @@ namespace RedmondBlog.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IBlogEmailSender _emailSender;
         private readonly ApplicationDbContext _context;
+        private readonly IImageService _imageService;
 
-        public HomeController(ILogger<HomeController> logger, IBlogEmailSender emailSender, ApplicationDbContext context)
+        public HomeController(ILogger<HomeController> logger,
+                              IBlogEmailSender emailSender,
+                              ApplicationDbContext context,
+                              IImageService imageService)
         {
             _logger = logger;
             _emailSender = emailSender;
             _context = context;
-
+            _imageService = imageService;
         }
 
         public async Task<IActionResult> Index(int? page)
@@ -40,17 +45,31 @@ namespace RedmondBlog.Controllers
                 .OrderByDescending(b => b.Created)
                 .ToPagedListAsync(pageNumber, pageSize);
 
+            var defaultBackgroundImage = _imageService.EncodeImageAsync($"defaultBackground.jpg");
+            var defaultBackgroundType = "jpg";
+
             ViewData["MainText"] = "Still under construction. Please check back soon.";
+            ViewData["HeaderImage"] = _imageService.DecodeImage(await defaultBackgroundImage, defaultBackgroundType);
             return View(await blogs);
         }
 
-        public IActionResult About()
+        public async Task<IActionResult> About()
         {
+            var aboutMeImage = _imageService.EncodeImageAsync($"aboutMe.jpg");
+            var aboutMeType = "jpg";
+
+            ViewData["MainText"] = "A little bit about me";
+            ViewData["HeaderImage"] = _imageService.DecodeImage(await aboutMeImage, aboutMeType);
             return View();
         }
 
-        public IActionResult Contact()
+        public async Task<IActionResult> Contact()
         {
+            var contactMeImage = _imageService.EncodeImageAsync($"contactMe.jpg");
+            var contactMeType = "jpg";
+
+            ViewData["MainText"] = "Please feel free to reach out. I would love to connect.";
+            ViewData["HeaderImage"] = _imageService.DecodeImage(await contactMeImage, contactMeType);
             return View();
         }
 
