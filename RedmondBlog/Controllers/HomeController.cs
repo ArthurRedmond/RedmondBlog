@@ -49,6 +49,7 @@ namespace RedmondBlog.Controllers
             var defaultBackgroundType = "jpg";
 
             ViewData["MainText"] = "Still under construction. Please check back soon.";
+            ViewData["SubText"] = "";
             ViewData["HeaderImage"] = _imageService.DecodeImage(await defaultBackgroundImage, defaultBackgroundType);
             return View(await blogs);
         }
@@ -58,7 +59,8 @@ namespace RedmondBlog.Controllers
             var aboutMeImage = _imageService.EncodeImageAsync($"aboutMe.jpg");
             var aboutMeType = "jpg";
 
-            ViewData["MainText"] = "A little bit about me";
+            ViewData["MainText"] = "About Me";
+            ViewData["SubText"] = "A little bit about me.";
             ViewData["HeaderImage"] = _imageService.DecodeImage(await aboutMeImage, aboutMeType);
             return View();
         }
@@ -68,7 +70,8 @@ namespace RedmondBlog.Controllers
             var contactMeImage = _imageService.EncodeImageAsync($"contactMe.jpg");
             var contactMeType = "jpg";
 
-            ViewData["MainText"] = "Please feel free to reach out. I would love to connect.";
+            ViewData["MainText"] = "Contact Me";
+            ViewData["SubText"] = "Please feel free to reach out. I would love to connect.";
             ViewData["HeaderImage"] = _imageService.DecodeImage(await contactMeImage, contactMeType);
             return View();
         }
