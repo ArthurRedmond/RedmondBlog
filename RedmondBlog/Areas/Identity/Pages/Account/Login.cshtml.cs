@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using RedmondBlog.Models;
+using RedmondBlog.Services;
 
 namespace RedmondBlog.Areas.Identity.Pages.Account
 {
@@ -21,14 +22,17 @@ namespace RedmondBlog.Areas.Identity.Pages.Account
         private readonly UserManager<BlogUser> _userManager;
         private readonly SignInManager<BlogUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IImageService _imageService;
 
-        public LoginModel(SignInManager<BlogUser> signInManager, 
+        public LoginModel(SignInManager<BlogUser> signInManager,
             ILogger<LoginModel> logger,
-            UserManager<BlogUser> userManager)
+            UserManager<BlogUser> userManager, 
+            IImageService imageService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _imageService = imageService;
         }
 
         [BindProperty]
@@ -52,7 +56,7 @@ namespace RedmondBlog.Areas.Identity.Pages.Account
             public string Password { get; set; }
 
             [Display(Name = "Remember me?")]
-            public bool RememberMe { get; set; }
+            public bool RememberMe { get; set; }                     
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -68,6 +72,11 @@ namespace RedmondBlog.Areas.Identity.Pages.Account
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            var backgroundImage = _imageService.EncodeImageAsync($"circutBoard.jpg");
+            var backgroundImageType = "jpg";
+
+            ViewData["HeaderImage"] = _imageService.DecodeImage(await backgroundImage, backgroundImageType);
 
             ReturnUrl = returnUrl;
         }

@@ -94,6 +94,11 @@ namespace RedmondBlog.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
+            var backgroundImage = _imageService.EncodeImageAsync($"circutBoard.jpg");
+            var backgroundImageType = "jpg";
+
+            ViewData["HeaderImage"] = _imageService.DecodeImage(await backgroundImage, backgroundImageType);
+
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
