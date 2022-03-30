@@ -44,6 +44,8 @@ namespace RedmondBlog.Areas.Identity.Pages.Account.Manage
             public string PhoneNumber { get; set; }
 
             public IFormFile Image { get; set; }
+
+            public string DisplayName { get; set; }
         }
 
         private async Task LoadAsync(BlogUser user)
@@ -56,7 +58,8 @@ namespace RedmondBlog.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                DisplayName = user.DisplayName
             };
         }
 
@@ -95,6 +98,12 @@ namespace RedmondBlog.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            if (Input.DisplayName != user.DisplayName)
+            {
+                user.DisplayName = Input.DisplayName;
+                await _userManager.UpdateAsync(user);
             }
 
             //If and only if the user selected a new image will I update the profile
